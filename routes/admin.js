@@ -10,7 +10,7 @@ router.get('/', function (req, res, next) {
 
   })
 
-  
+
 
 });
 router.get('/add-products', (req, res) => {
@@ -27,7 +27,7 @@ router.post('/add-products', (req, res) => {
       if (!err) {
         res.render('admin/add-products')
 
-      }else{
+      } else {
         console.log('error')
       }
     })
@@ -35,14 +35,31 @@ router.post('/add-products', (req, res) => {
   })
 
 })
-router.get('/delete-products/',(req,res)=>{
-  let proId=req.query.id
+router.get('/delete-products/', (req, res) => {
+  let proId = req.query.id
   console.log(proId)
-  productHelpers.deleteProduct(proId).then(()=>{
+  productHelpers.deleteProduct(proId).then(() => {
     res.redirect('/admin/')
   })
 
 })
+router.get('/edit-products/', (req, res) => {
+  productHelpers.getProductDetails(req.query.id).then((product) => {
+    res.render('admin/edit-products', { admin: true, product })
+  })
 
+})
+router.post('/edit-products/', (req, res) => {
+  console.log(req.body);
+  console.log(req.query.id);
+  productHelpers.updateProductDetails(req.query.id, req.body).then(() => {
+    res.redirect('/admin/')
+  })
+  if (req.fles.Image) {
+    image.mv('./public/product-images/' + req.query.id + '.jpg')
+
+  }
+
+})
 
 module.exports = router;
