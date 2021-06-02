@@ -1,0 +1,38 @@
+<section>
+    <div class="container text-center mt-5">
+        <div class="col-md-6">
+            <div class="signup-content">
+                <form method="POST" id="signup-form" class="signup-form" action="/signup">
+                    <h2 class="form-title">Create account</h2>
+                    <div class="form-group">
+                        <input type="text" class="form-input mt-4" style="width: 30rem;" name="Name" id="name"
+                            placeholder="Your Name" />
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input mt-4" style="width: 30rem;" name="Email" id="email"
+                            placeholder="Your Email" />
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-input mt-4" style="width: 30rem;" name="Password"
+                            id="password" placeholder="New Password" />
+                        <span toggle="#password" class="zmdi zmdi-eye field-icon toggle-password"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="checkbox" name="agree-term" id="agree-term" class="agree-term mt-4" />
+                        <label for="agree-term" class="label-agree-term mt-4 mr-3"><span></span>I agree all statements
+                            in <a href="#" class="term-service">Terms of service</a></label>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" name="submit" id="submit" class="form-submit btn-primary mt-4"
+                            value="Sign UP" />
+                    </div>
+                </form>
+                <p class="loginhere mt-4">
+                    Have already an account ? <a href="/login" class="loginhere-link">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</section>
