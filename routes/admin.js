@@ -19,10 +19,12 @@ router.get('/add-products', (req, res) => {
 router.post('/add-products', (req, res) => {
   //console.log(req.body)
   //console.log(req.files.image)
+  
 
 
   productHelpers.addProduct(req.body, (id) => {
     let image = req.files.Image
+    console.log(id)
     image.mv('./public/product-images/' + id + '.jpg', (err, done) => {
       if (!err) {
         res.render('admin/add-products')
@@ -55,8 +57,8 @@ router.post('/edit-products/', (req, res) => {
   productHelpers.updateProductDetails(req.query.id, req.body).then(() => {
     res.redirect('/admin/')
   })
-  if (req.fles.Image) {
-    image.mv('./public/product-images/' + req.query.id + '.jpg')
+  if (req.files.Image) {
+    req.files.Image.mv('./public/product-images/' + req.query.id + '.jpg')
 
   }
 
