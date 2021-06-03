@@ -72,7 +72,7 @@ router.get('/logout', (req, res) => {
 router.get('/cart', verifyLogin, (req, res) => {
   userHelpers.getCartProducts(req.session.user._id).then((cartItems) => {
 
-
+console.log(cartItems)
     res.render('user/cart', { 'user': req.session.user, cartItems })
   })
 

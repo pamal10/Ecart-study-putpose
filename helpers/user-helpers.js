@@ -50,7 +50,7 @@ module.exports = {
             await db.get().collection(collection.CART_COLLECTION).findOne({ user: objectId(userId) }).then((userCart) => {
                 console.log(proId)
                 if (userCart) {
-                    let proIndex = userCart.products.findIndex(product => product.item === proId)
+                    let proIndex = userCart.products.findIndex(products => products.item == proId)
                     if (proIndex != -1) {
                         db.get().collection(collection.CART_COLLECTION).updateOne({ 'products.item': objectId(proId) }, {
                             $inc: {
@@ -97,26 +97,31 @@ module.exports = {
                     $match: { user: objectId(userId) }
                 },
                 {
-                    $lookup: {
+                    $unwind: '$products'
+                },
+                {
+                    $project: {
+                        item: '$products.item',
+                        quantity: '$products.quantity'
+                    }
+                },
+                {
+                    $lookup:
+                    {
                         from: collection.PRODUCT_COLLECTION,
-                        let: { prodList: '$products' },
-                        pipeline: [
-                            {
-                                $match: {
-                                    $expr: {
-                                        $in: ['$_id', "$$prodList"]
-
-                                    }
-                                }
-                            }
-                        ],
-                        as: 'userCartItems'
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'products'
                     }
                 }
+
+
             ]).toArray()
 
 
-            resolve(cartItems[0].userCartItems)
+            resolve(cartItems)
+
+
 
 
         })
