@@ -13,7 +13,8 @@
                             <h5 class="card-title text-center">{{this.Product}}</h5>
                             <p class="card-text text-center">{{this.Description}}</p>
                             <h3 class="text-center">Rs {{this.Price}}</h3>
-                            <a href="/add-to-cart/?id={{this._id}}" class="btn btn-primary" >Add To Cart</a>
+                            <button onclick="addToCart('{{this._id}}')" class="btn btn-primary">Add To cart</button>
+                           
                         </div>
                     </div>
                 </div>
