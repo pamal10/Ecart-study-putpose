@@ -89,6 +89,11 @@ router.post('/count-change',(req,res)=>{
     res.json(response)
   })
 })
+router.get('/checkout',verifyLogin, async (req,res)=>{
+  let total=await userHelpers.getTotalAmount(req.session.user._id)
+  
+  res.render('user/checkout',{total})
+})
 
 
 module.exports = router;
