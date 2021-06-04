@@ -122,8 +122,8 @@ module.exports = {
 
 
             ]).toArray()
-           
-           console.log(cartItems);
+
+            console.log(cartItems);
 
             resolve(cartItems)
 
@@ -142,26 +142,36 @@ module.exports = {
             })
         })
     },
-    countChange: (cartId, proId, count, quantity) => {
-        return new Promise( (resolve, reject) => {
-            if (quantity == 1 && count == -1) {
-                 db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(cartId) },
-                    {
-                        $pull: { products: { item: objectId(proId) } }
-                    }
+    countChange: (details) => {
+        details.count = parseInt(details.count)
+        details.quantity = parseInt(details.quantity)
+        return new Promise((resolve, reject) => {
+            if (details.count == -1 && details.quantity == 1) {
+
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: ObjectId(details.cart) }, {
+
+                    $pull: { products: { item: ObjectId(details.product) } }
+
+                }
                 ).then((response) => {
                     resolve({ removedProduct: true })
                 })
-            } else {
-                 db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(cartId), 'products.item': objectId(proId) }, {
-                    $inc: {
-                        'products.$.quantity': count
-                    }
-                }).then((response) => {
-
-                    resolve(true)
-                })
             }
+            else {
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: ObjectId(details.cart), 'products.item': ObjectId(details.product) },
+                    {
+                        $inc: { 'products.$.quantity': details.count }
+                    }
+
+
+
+                ).then((response) => {
+                    resolve({ status: true })
+                })
+
+            }
+
+
 
         })
     },
@@ -195,13 +205,13 @@ module.exports = {
                 {
                     $group: {
                         _id: null,
-                        total: { $sum:{$multiply:[{ $toInt: '$quantity' },{ $toInt: '$products.Price' }]}}
+                        total: { $sum: { $multiply: [{ $toInt: '$quantity' }, { $toInt: '$products.Price' }] } }
                     }
                 }
 
 
             ]).toArray()
-                    console.log(Total)
+            console.log(Total)
 
             resolve(Total[0].total)
 

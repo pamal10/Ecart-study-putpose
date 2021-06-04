@@ -85,7 +85,8 @@ console.log('call');
 })
 router.post('/count-change',(req,res)=>{
   console.log('call');
-  userHelpers.countChange(req.body.cart,req.body.product,req.body.count,req.body.quantity).then((response)=>{
+  console.log(req.body)
+  userHelpers.countChange(req.body).then((response)=>{
     res.json(response)
   })
 })
