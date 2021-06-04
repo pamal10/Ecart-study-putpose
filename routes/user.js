@@ -72,7 +72,7 @@ router.get('/logout', (req, res) => {
 router.get('/cart', verifyLogin, (req, res) => {
   userHelpers.getCartProducts(req.session.user._id).then((cartItems) => {
 
-console.log(cartItems)
+
     res.render('user/cart', { 'user': req.session.user, cartItems })
   })
 
@@ -81,6 +81,12 @@ router.get('/add-to-cart/',  (req, res) => {
 console.log('call');
   userHelpers.addToCart(req.query.id, req.session.user._id).then(() => {
     res.json({status:true})
+  })
+})
+router.post('/count-change',(req,res)=>{
+  console.log('call');
+  userHelpers.countChange(req.body.cart,req.body.product,req.body.count,req.body.quantity).then((response)=>{
+    res.json(response)
   })
 })
 

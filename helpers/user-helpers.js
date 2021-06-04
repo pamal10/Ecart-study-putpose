@@ -5,6 +5,8 @@ var bcrypt = require('bcrypt')
 const { response } = require('../app')
 var objectId = require('mongodb').ObjectID
 const { resolve } = require('promise')
+const { ObjectID } = require('bson')
+const { CART_COLLECTION } = require('../config/collections')
 
 
 module.exports = {
@@ -52,7 +54,7 @@ module.exports = {
                 if (userCart) {
                     let proIndex = userCart.products.findIndex(products => products.item == proId)
                     if (proIndex != -1) {
-                        db.get().collection(collection.CART_COLLECTION).updateOne({ 'products.item': objectId(proId) }, {
+                        db.get().collection(collection.CART_COLLECTION).updateOne({ user: ObjectID(userId), 'products.item': objectId(proId) }, {
                             $inc: {
                                 'products.$.quantity': 1
                             }
@@ -113,6 +115,9 @@ module.exports = {
                         foreignField: '_id',
                         as: 'products'
                     }
+                },
+                {
+                    $project: { item: 1, quantity: 1, products: { $arrayElemAt: ['$products', 0] } }
                 }
 
 
@@ -134,6 +139,29 @@ module.exports = {
                 count = cart.products.length
                 resolve(count)
             })
+        })
+    },
+    countChange: (cartId, proId, count, quantity) => {
+        return new Promise((reolve, reject) => {
+            if (quantity == 1 && count == -1) {
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(cartId) },
+                    {
+                        $pull: { products: { item: objectId(proId) } }
+                    }
+                ).then((response) => {
+                    reolve({ removedProduct: true })
+                })
+            } else {
+                db.get().collection(collection.CART_COLLECTION).updateOne({ _id: objectId(cartId), 'products.item': objectId(proId) }, {
+                    $inc: {
+                        'products.$.quantity': count
+                    }
+                }).then((response) => {
+
+                    resolve(true)
+                })
+            }
+
         })
     }
 
