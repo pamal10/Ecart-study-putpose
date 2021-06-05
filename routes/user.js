@@ -5,7 +5,7 @@ var router = express.Router();
 const productHelpers = require('../helpers/product-helpers')
 const userHelpers = require('../helpers/user-helpers')
 const verifyLogin = (req, res, next) => {
-  if (req.session.loggedIn) {
+  if (req.session.userLoggedIn) {
     next()
   } else {
     res.redirect('/login')
@@ -17,7 +17,7 @@ const verifyLogin = (req, res, next) => {
 router.get('/', function (req, res, next) {
   let user = req.session.user
   let cartCount = null
-  if (req.session.loggedIn) {
+  if (req.session.user) {
     userHelpers.getCartCount(user._id).then((count) => {
       console.log(count)
       cartCount = count
@@ -29,12 +29,12 @@ router.get('/', function (req, res, next) {
   })
 });
 router.get('/login', (req, res) => {
-  if (req.session.loggedIn) {
+  if (req.session.user) {
     res.redirect('/')
 
   } else {
-    res.render('user/login', { 'loginErr': req.session.loginErr })
-    req.session.loginErr = false
+    res.render('user/login', { 'loginErr': req.session.userLoginErr })
+    req.session.userLoginErr = false
   }
 
 
@@ -61,14 +61,15 @@ router.post('/login', (req, res) => {
       req.session.user.loggedIn = true
       res.redirect('/')
     } else {
-      req.session.loginErr = true
+      req.session.userLoginErr = true
       res.redirect('/login')
     }
   })
 
 })
 router.get('/logout', (req, res) => {
-  req.session.user=null 
+  req.session.user=null
+  req.session.userLoggedin=false
   res.redirect('/')
 })
 router.get('/cart', verifyLogin, async (req, res) => {
