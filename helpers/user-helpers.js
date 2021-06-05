@@ -9,7 +9,7 @@ const { ObjectID } = require('bson')
 const { CART_COLLECTION } = require('../config/collections')
 const Razorpay=require('razorpay')
 var instance = new Razorpay({
-    key_id: 'rzp_test_G5InNhCrovBNz0 ',
+    key_id: 'rzp_test_G5InNhCrovBNz0',
     key_secret: 'ncaJVBfJNd54yKU7vyhD3Qx0',
   });
 
@@ -264,7 +264,7 @@ module.exports = {
     generateRazorPay:(orderId,price)=>{
         return new Promise((resolve,reject)=>{
             var options = {
-                amount: price,  // amount in the smallest currency unit
+                amount: price*100,  // amount in the smallest currency unit
                 currency: "INR",
                 receipt:''+  orderId
               };
@@ -273,7 +273,7 @@ module.exports = {
                     console.log(err)
                 }
                 else{
-                console.log(order);
+                console.log('order: '+order);
                 resolve(order)
                 }
               });
