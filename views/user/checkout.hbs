@@ -12,7 +12,7 @@
                         <input type="text" name="pincode" id="pincode" class="form-control">
                         <label for="">Mobile</label>
                         <input type="text" name="mobile" id="mobile" class="form-control">
-                        <!-- <input type="text" name="userId" id="" value="{{user._id}}" hidden>
+                        <input type="text" name="userId" id="" value="{{user}}" hidden>
 -->
 
 
@@ -48,3 +48,18 @@
         </form>
     </div>
 </section>
+
+
+<script>
+    $("#checkout-form").submit((e)=>{
+        e.preventDefault()
+        $.ajax({
+            url:'/place-order',
+            method:'post',
+            data:$('#checkout-form').serialize(),
+            success:(response)=>{
+                alert(response)
+            }
+        })
+    })
+</script>

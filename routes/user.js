@@ -69,33 +69,48 @@ router.get('/logout', (req, res) => {
   req.session.destroy()
   res.redirect('/')
 })
-router.get('/cart', verifyLogin, (req, res) => {
-  userHelpers.getCartProducts(req.session.user._id).then((cartItems) => {
-
-
-    res.render('user/cart', { 'user': req.session.user, cartItems })
+router.get('/cart', verifyLogin, async  (req, res) => {
+  let count =await userHelpers.getCartCount(req.session.user._id)
+  if(count>0){
+  userHelpers.getCartProducts(req.session.user._id).then(async (cartItems) => {
+    
+    let totalAmount = await userHelpers.getTotalAmount(req.session.user._id)
+    res.render('user/cart', { user: req.session.user, cartItems, totalAmount })
   })
+  }else{
+    res.render('user/cart-empty')
+  }
+
+  
 
 })
-router.get('/add-to-cart/',  (req, res) => {
-console.log('call');
+router.get('/add-to-cart/', (req, res) => {
+  console.log('call');
   userHelpers.addToCart(req.query.id, req.session.user._id).then(() => {
-    res.json({status:true})
+    res.json({ status: true })
   })
 })
-router.post('/count-change',(req,res)=>{
+router.post('/count-change', (req, res) => {
   console.log('call');
   console.log(req.body)
-  userHelpers.countChange(req.body).then((response)=>{
+  userHelpers.countChange(req.body).then(async(response) => {
+    response.total=await userHelpers.getTotalAmount(req.body.user)
     res.json(response)
   })
 })
-router.get('/checkout',verifyLogin, async (req,res)=>{
-  let total=await userHelpers.getTotalAmount(req.session.user._id)
-  
-  res.render('user/checkout',{total})
-})
+router.get('/checkout', verifyLogin, async (req, res) => {
+  let total = await userHelpers.getTotalAmount(req.session.user._id)
 
+  res.render('user/checkout', { total ,user:req.session.user._id})
+})
+router.post('/place-order',async(req,res)=>{
+  let products=await userHelpers.getCartProductsList(req.body.userId)
+  let totalPrice=await userHelpers.getTotalAmount(req.body.userId)
+  userHelpers.placeOrder(req.body,products,totalPrice).then(()=>{
+    res.json({status:true})
+
+  })
+})
 
 module.exports = router;
 
