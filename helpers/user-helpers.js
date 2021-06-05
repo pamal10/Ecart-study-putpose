@@ -7,6 +7,11 @@ var objectId = require('mongodb').ObjectID
 const { resolve } = require('promise')
 const { ObjectID } = require('bson')
 const { CART_COLLECTION } = require('../config/collections')
+const Razorpay=require('razorpay')
+var instance = new Razorpay({
+    key_id: 'rzp_test_G5InNhCrovBNz0 ',
+    key_secret: 'ncaJVBfJNd54yKU7vyhD3Qx0',
+  });
 
 
 module.exports = {
@@ -137,6 +142,7 @@ module.exports = {
         let count = 0
         return new Promise(async (resolve, reject) => {
             await db.get().collection(collection.CART_COLLECTION).findOne({ user: objectId(userId) }).then((cart) => {
+                console.log('pro'+cart.products);
                 count = cart.products.length
                 resolve(count)
             })
@@ -223,9 +229,10 @@ module.exports = {
 
     },
     getCartProductsList:(userId)=>{
+        console.log(userId);
         return new Promise(async(resolve,reject)=>{
             let cart= await db.get().collection(collection.CART_COLLECTION).findOne({user:objectId(userId)})
-            console.log(cart)
+            console.log('cart: '+cart)
             resolve(cart.products)
         })
     },
@@ -240,19 +247,42 @@ module.exports = {
                 },
                 userId:objectId(order.userId),
                 paymentMethod:order['payment-method'],
-                products:order.products,
+                products:products,
                 totalAmount:total,
                 date:new Date(),
                 status:status
             }
             db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response)=>{
                 db.get().collection(collection.CART_COLLECTION).removeOne({user:objectId(order.userId)})
-                resolve()
+                console.log('id'+response.ops[0]._id);
+                resolve(response.ops[0]._id)
             
             })
         })
 
+    },
+    generateRazorPay:(orderId,price)=>{
+        return new Promise((resolve,reject)=>{
+            var options = {
+                amount: price,  // amount in the smallest currency unit
+                currency: "INR",
+                receipt:''+  orderId
+              };
+              instance.orders.create(options, function(err, order) {
+                if(err){
+                    console.log(err)
+                }
+                else{
+                console.log(order);
+                resolve(order)
+                }
+              });
+       
+       
+        })
+
     }
+
         
 
 
