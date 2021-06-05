@@ -46,8 +46,9 @@ router.get('/signup', (req, res) => {
 router.post('/signup', (req, res) => {
   userHelpers.getUserData(req.body).then((info) => {
     console.log(info)
-    req.session.loggedIn = true
+    
     req.session.user = response
+    req.session.user.loggedIn = true
     res.redirect('')
   })
 
@@ -55,8 +56,9 @@ router.post('/signup', (req, res) => {
 router.post('/login', (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
     if (response.status) {
-      req.session.loggedIn = true
+      
       req.session.user = response.user
+      req.session.user.loggedIn = true
       res.redirect('/')
     } else {
       req.session.loginErr = true
@@ -66,16 +68,21 @@ router.post('/login', (req, res) => {
 
 })
 router.get('/logout', (req, res) => {
-  req.session.destroy()
+  req.session.user=null 
   res.redirect('/')
 })
 router.get('/cart', verifyLogin, async (req, res) => {
-  let count = await userHelpers.getCartCount(req.session.user._id)
-  userHelpers.getCartProducts(req.session.user._id).then(async (cartItems) => {
 
-    let totalAmount = await userHelpers.getTotalAmount(req.session.user._id)
-    res.render('user/cart', { user: req.session.user, cartItems, totalAmount })
-  })
+  let cartItems = await userHelpers.getCartProducts(req.session.user._id)
+  let totalAmount = 0
+
+  if (cartItems.length > 0) {
+     totalAmount = await userHelpers.getTotalAmount(req.session.user._id)
+  }
+
+  res.render('user/cart', { user: req.session.user, cartItems, totalAmount })
+
+
 
 })
 router.get('/add-to-cart/', (req, res) => {
@@ -115,7 +122,14 @@ router.post('/place-order', async (req, res) => {
   })
 })
 router.post('/verify-payment', (req, res) => {
+  userHelpers.verifyPayment(req.body).then(() => {
+    userHelpers.changePaymentStatus(req.body['order[receipt]']).then(() => {
+      res.json({ status: true })
+    })
 
+  }).catch((err) => {
+    res.json({ status: false, errMsg: '' })
+  })
 })
 router.get('/cod-success', (req, res) => {
   res.render('user/cod-success')
