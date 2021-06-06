@@ -237,9 +237,9 @@ module.exports = {
         })
     },
     placeOrder: (order, products, total) => {
-        let date = new Date()
 
-      
+
+
 
 
         return new Promise((resolve, reject) => {
@@ -254,8 +254,11 @@ module.exports = {
                 paymentMethod: order['payment-method'],
                 products: products,
                 totalAmount: total,
-                date: date,
+
+                date: new Date(),
+
                 status: status
+
             }
             db.get().collection(collection.ORDER_COLLECTION).insertOne(orderObj).then((response) => {
                 db.get().collection(collection.CART_COLLECTION).removeOne({ user: objectId(order.userId) })
@@ -321,8 +324,49 @@ module.exports = {
             resolve(Orders)
 
         })
-    }
+    },
+    viewOrderedProducts: (orderId) => {
+        return new Promise(async(resolve, reject) => {
+            let orderedProducts = await db.get().collection(collection.ORDER_COLLECTION).aggregate([
+                {
+                    $match: { _id: objectId(orderId) }
+                },
+                {
+                    $unwind: '$products'
+                },
+                {
+                    $project: {
+                        item: '$products.item',
+                        quantity: '$products.quantity'
+                    }
+                },
+                {
+                    $lookup:
+                    {
+                        from: collection.PRODUCT_COLLECTION,
+                        localField: 'item',
+                        foreignField: '_id',
+                        as: 'products'
+                    }
+                },
+                {
+                    $project: { item: 1, quantity: 1, deliveryDetails: 1, products: { $arrayElemAt: ['$products', 0] } }
+                }
 
+
+            ]).toArray()
+
+            
+
+            resolve(orderedProducts)
+
+
+
+
+        })
+
+   
+}
 
 
 

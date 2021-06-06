@@ -138,8 +138,14 @@ router.get('/cod-success', (req, res) => {
 router.get('/orders', (req, res) => {
   let user=req.session.user._id
   userHelpers.getOrderDetails(user).then((order) => {
-    console.log(order);
+    
     res.render('user/orders-list', { user:req.session.user,order})
+  })
+})
+router.get('view-orderedProducts/',(req,res)=>{
+  userHelpers.viewOrderedProducts(req.query.id).then((prodcuts)=>{
+console.log('ad'+products);
+res.render('user/ordered-products')
   })
 })
 
