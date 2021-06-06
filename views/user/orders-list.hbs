@@ -1,0 +1,27 @@
+<section>
+    <div class="container">
+        <table class="table mt-5">
+            <thead>
+                <tr>
+                    <th scope="col">Date And Time of Booking</th>
+                    <th scope="col">Total Amount</th>
+                    <th scope="col">Payment Method</th>
+                    <th scope="col">Payment Status</th>
+                    <th scope="col">View Ordered Products</th>
+
+
+                </tr>
+            </thead>
+            <tbody>
+                {{#each order}}
+                <tr>
+                    <td>{{this.date}}</td>
+                    <td>Rs {{this.totalAmount}}</td>
+                    <td>{{this.paymentMethod}}</td>
+                    <td>{{this.status}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</section>

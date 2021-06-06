@@ -58,16 +58,16 @@
             method: 'post',
             data: $('#checkout-form').serialize(),
             success: (response) => {
-               
+
                 if (response.codSuccess) {
                     alert(response)
-                    location.href= '/cod-success'
+                    location.href = '/cod-success'
                 } else {
-                     alert(response)
-                    console.log('response'+response)
+                    alert(response)
+                    console.log('response' + response)
                     razorPayment(response)
 
-                    
+
                 }
             }
         })
@@ -82,7 +82,7 @@
             "image": "https://example.com/your_logo",
             "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
             "handler": function (response) {
-               
+
                 verifyPayment(response, order)
             },
             "prefill": {
@@ -100,7 +100,7 @@
         var rzp1 = new Razorpay(options);
         rzp1.open();
     }
-    function verifyPayment(payment,order) {
+    function verifyPayment(payment, order) {
         $.ajax({
             url: '/verify-payment',
             data: {
@@ -108,10 +108,12 @@
                 order
             },
             method: 'post',
-            success:(response)=>{
-                if(response.status){
-                     location.href= '/cod-success'
-                }else{
+            success: (response) => {
+                console.log(response)
+                if (response.status) {
+                    location.href = '/cod-success'
+                    alert('payment success')
+                } else {
                     alert('Payment Failed')
                 }
             }

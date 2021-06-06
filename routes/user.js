@@ -46,19 +46,19 @@ router.get('/signup', (req, res) => {
 router.post('/signup', (req, res) => {
   userHelpers.getUserData(req.body).then((info) => {
     console.log(info)
-    
-    req.session.user = response
-    req.session.user.loggedIn = true
-    res.redirect('')
+
+    req.session.user = info
+    req.session.userLoggedIn = true
+    res.redirect('/')
   })
 
 })
 router.post('/login', (req, res) => {
   userHelpers.doLogin(req.body).then((response) => {
     if (response.status) {
-      
+
       req.session.user = response.user
-      req.session.user.loggedIn = true
+      req.session.userLoggedIn = true
       res.redirect('/')
     } else {
       req.session.userLoginErr = true
@@ -68,8 +68,8 @@ router.post('/login', (req, res) => {
 
 })
 router.get('/logout', (req, res) => {
-  req.session.user=null
-  req.session.userLoggedin=false
+  req.session.user = null
+  req.session.userLoggedin = false
   res.redirect('/')
 })
 router.get('/cart', verifyLogin, async (req, res) => {
@@ -78,7 +78,7 @@ router.get('/cart', verifyLogin, async (req, res) => {
   let totalAmount = 0
 
   if (cartItems.length > 0) {
-     totalAmount = await userHelpers.getTotalAmount(req.session.user._id)
+    totalAmount = await userHelpers.getTotalAmount(req.session.user._id)
   }
 
   res.render('user/cart', { user: req.session.user, cartItems, totalAmount })
@@ -92,13 +92,13 @@ router.get('/add-to-cart/', (req, res) => {
     res.json({ status: true })
   })
 })
-router.post('/count-change', (req, res) => {
+router.post('/count-change', async (req, res) => {
   console.log('call');
   console.log(req.body)
-  userHelpers.countChange(req.body).then(async (response) => {
-    response.total = await userHelpers.getTotalAmount(req.body.user)
-    res.json(response)
-  })
+  let response = userHelpers.countChange(req.body)
+  response.total = await userHelpers.getTotalAmount(req.body.user)
+  res.json(response)
+
 })
 router.get('/checkout', verifyLogin, async (req, res) => {
   let total = await userHelpers.getTotalAmount(req.session.user._id)
@@ -135,7 +135,13 @@ router.post('/verify-payment', (req, res) => {
 router.get('/cod-success', (req, res) => {
   res.render('user/cod-success')
 })
-
+router.get('/orders', (req, res) => {
+  let user=req.session.user._id
+  userHelpers.getOrderDetails(user).then((order) => {
+    console.log(order);
+    res.render('user/orders-list', { user:req.session.user,order})
+  })
+})
 
 module.exports = router;
 
